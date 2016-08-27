@@ -22,8 +22,8 @@
 # https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-n/scripts/gapps.sh
 #
 
-TIMESTAMP="20160815"
-PACKAGE="open_gapps-arm-6.0-pico-$TIMESTAMP.zip"
+TIMESTAMP="20160827"
+PACKAGE="open_gapps-arm-7.0-pico-$TIMESTAMP.zip"
 
 SHOW_HELP=false
 ADB_ADDRESS=""
