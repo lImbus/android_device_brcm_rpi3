@@ -230,56 +230,35 @@ create_partitions()
 
     echo " * Start partitioning..."
 
-    # add partition 1 -> boot
+    # 1. partition -> boot
     echo ""
     echo "  - creating 'boot'"
     printf "n\np\n1\n\n+${SIZE_P1}M\nw\n" | sudo fdisk $DEVICE_LOCATION
 
-    # re-read the partition table
-    ((TEST+=$?))
-    sudo partprobe
-
-    # set the first partition as bootable
+    # 1.1. set the first partition as bootable
     echo ""
     echo "  - setting bootable flag"
     printf "a\n1\nw\n" | sudo fdisk $DEVICE_LOCATION
 
-    # set the partition type to "W95 FAT32 (LBA)"
+    # 1.2. set the partition type to "W95 FAT32 (LBA)"
     echo ""
     echo "  - setting correct partition type"
     printf "t\nc\nw\n" | sudo fdisk $DEVICE_LOCATION
 
-    # add partition 2 -> system
+    # 2. partition -> system
     echo ""
     echo "  - creating 'system'"
     printf "n\np\n2\n\n+${SIZE_P2}M\nw\n" | sudo fdisk $DEVICE_LOCATION
 
-    # re-read the partition table
-    ((TEST+=$?))
-    sudo partprobe
-
-    # add partition 3 -> cache
+    # 3. partition -> cache
     echo ""
     echo "  - creating 'cache'"
     printf "n\np\n3\n\n+${SIZE_P3}M\nw\n" | sudo fdisk $DEVICE_LOCATION
 
-    # re-read the partition table
-    ((TEST+=$?))
-    sudo partprobe
-
-    # add partition 4 -> userdata
+    # 4. partition -> userdata
     echo ""
     echo "  - creating 'userdata'"
     printf "n\np\n\n\nw\n" | sudo fdisk $DEVICE_LOCATION
-
-    # re-read the partition table
-    ((TEST+=$?))
-    sudo partprobe
-
-    if [[ $TEST -gt 0 ]]; then
-        echo "ERR: an error while partitioning occured."
-        exit 1
-    fi
 
     echo ""
     echo " * Printing the new partition table..."
