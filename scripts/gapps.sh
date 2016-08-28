@@ -59,7 +59,9 @@ wait_for_adb()
     while true; do
         sleep 1
         adb kill-server > /dev/null
+        sleep 1
         adb connect $ADB_ADDRESS > /dev/null
+        sleep 1
         if is_booted; then
             break
         fi
@@ -149,7 +151,7 @@ install_package()
     wait_for_adb
     reboot_device
 
-    echo " * Waiting for ADB (errors are OK)..."
+    echo " * Waiting for ADB..."
     wait_for_adb
 
     echo " * Applying correct permissions..."
