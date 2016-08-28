@@ -155,7 +155,6 @@ install_package()
     echo " * Applying correct permissions..."
     adb shell "pm grant com.google.android.gms android.permission.ACCESS_COARSE_LOCATION"
     adb shell "pm grant com.google.android.gms android.permission.ACCESS_FINE_LOCATION"
-    adb shell "pm grant com.google.android.setupwizard android.permission.READ_PHONE_STATE"
 }
 
 # ------------------------------------------------
