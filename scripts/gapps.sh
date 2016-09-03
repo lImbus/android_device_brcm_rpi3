@@ -23,10 +23,12 @@
 #
 
 TIMESTAMP="20160827"
-PACKAGE="open_gapps-arm-7.0-pico-$TIMESTAMP.zip"
+PACKAGE=""
 
 SHOW_HELP=false
 ADB_ADDRESS=""
+
+ARCHITECTURE="none"
 
 # ------------------------------------------------
 # Helping functions
@@ -36,10 +38,11 @@ show_help()
 {
 cat << EOF
 USAGE:
-  $0 [-h] -a IP
+  $0 [-h] -i IP -a ARCH
 OPTIONS:
+  -a  Architecture of the device [x86] [x86_64] [arm] [arm64]
   -h  Show help
-  -a  IP address for ADB
+  -i  IP address for ADB
 EOF
 }
 
@@ -96,7 +99,7 @@ prepare_gapps()
     if [ ! -d "gapps/pkg" ]; then
         echo " * Downloading OpenGApps package..."
         echo ""
-        wget https://github.com/opengapps/arm/releases/download/$TIMESTAMP/$PACKAGE -O gapps/$PACKAGE
+        wget https://github.com/opengapps/$ARCHITECTURE/releases/download/$TIMESTAMP/$PACKAGE -O gapps/$PACKAGE
     fi
 
     if [ ! -f "gapps/$PACKAGE" ]; then
@@ -164,9 +167,10 @@ install_package()
 # ------------------------------------------------
 
 # save the passed options
-while getopts ":a:h" flag; do
+while getopts ":i:a:h" flag; do
 case $flag in
-    "a") ADB_ADDRESS="$OPTARG" ;;
+    "i") ADB_ADDRESS="$OPTARG" ;;
+    "a") ARCHITECTURE="$OPTARG" ;;
     "h") SHOW_HELP=true ;;
     *)
          echo ""
@@ -177,12 +181,19 @@ case $flag in
 esac
 done
 
+if [ "$ARCHITECTURE" != "x86" -a "$ARCHITECTURE" != "x86_64" -a "$ARCHITECTURE" != "arm" -a "$ARCHITECTURE" != "arm64" ]; then
+    echo "wrong arch $ARCHITECTURE";
+    show_help
+    exit 1
+fi
+
 if [[ "$SHOW_HELP" = true ]]; then
     show_help
     exit 1
 fi
 
-echo "GApps installation script for RPi"
+PACKAGE="open_gapps-$ARCHITECTURE-7.0-pico-$TIMESTAMP.zip"
+echo "GApps installation script for RPi/x86"
 echo "Used package: $PACKAGE"
 echo "ADB IP address: $ADB_ADDRESS"
 echo ""
