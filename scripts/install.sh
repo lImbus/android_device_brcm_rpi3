@@ -111,10 +111,16 @@ check_device()
 
 check_partitions()
 {
-    PARTITION_COUNT=$(ls -al ${DEVICE_LOCATION}${DEVICE_SUFFIX}? | wc -l)
+    echo " * Listing all available partitions..."
+    PARTITION_LIST=$(sudo fdisk -l ${DEVICE_LOCATION} | grep "^/dev/")
+    echo ""
+    echo "$PARTITION_LIST"
+    echo ""
+
+    PARTITION_COUNT=$(wc -l <<< "${PARTITION_LIST}")
     echo " * Detected $PARTITION_COUNT partitions on $DEVICE_LOCATION"
 
-    # allow less partitions if we are going to re-partition it anyways
+    # allow all numbers if we are going to re-partition it anyways
     if [ "$PARTITION" = true ]; then
         echo "  - ignoring this count due to upcoming partitioning"
         PARTITION_COUNT=4
@@ -195,8 +201,16 @@ check_sizes()
     fi
 }
 
+wait_for_device()
+{
+    sleep 1
+    sudo partprobe $DEVICE_LOCATION
+}
+
 create_partitions()
 {
+    local TEST=0
+
     # no partitioning was requested
     if [ "$PARTITION" = false ]; then
         echo " * Skipping partitioning..."
@@ -204,29 +218,23 @@ create_partitions()
     fi
 
     echo " * Destroying old partition table..."
-    local TEST=0
-
-    # re-read the partition table
-    sudo partprobe $DEVICE_LOCATION > /dev/null 2>&1
-
+    wait_for_device
     sudo dd if=/dev/zero of=$DEVICE_LOCATION bs=1024 count=1 conv=notrunc > /dev/null 2>&1
     ((TEST+=$?))
 
-    # re-read the partition table
-    sudo partprobe $DEVICE_LOCATION > /dev/null 2>&1
-
     echo " * Create a new partition table..."
 
+    wait_for_device
     printf "o\nw\n" | sudo fdisk $DEVICE_LOCATION > /dev/null 2>&1
     ((TEST+=$?))
-
-    # re-read the partition table
-    sudo partprobe $DEVICE_LOCATION
 
     if [[ $TEST -gt 0 ]]; then
         echo "ERR: failed to recreate the partition table!"
         exit 1
     fi
+
+    # re-read the partition table
+    wait_for_device
 
     echo " * Start partitioning..."
 
@@ -234,31 +242,38 @@ create_partitions()
     echo ""
     echo "  - creating 'boot'"
     printf "n\np\n1\n\n+${SIZE_P1}M\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
 
-    # 1.1. set the first partition as bootable
-    echo ""
-    echo "  - setting bootable flag"
-    printf "a\n1\nw\n" | sudo fdisk $DEVICE_LOCATION
-
-    # 1.2. set the partition type to "W95 FAT32 (LBA)"
-    echo ""
-    echo "  - setting correct partition type"
-    printf "t\nc\nw\n" | sudo fdisk $DEVICE_LOCATION
 
     # 2. partition -> system
     echo ""
     echo "  - creating 'system'"
     printf "n\np\n2\n\n+${SIZE_P2}M\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
 
     # 3. partition -> cache
     echo ""
     echo "  - creating 'cache'"
     printf "n\np\n3\n\n+${SIZE_P3}M\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
 
     # 4. partition -> userdata
     echo ""
     echo "  - creating 'userdata'"
     printf "n\np\n\n\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
+
+    # 5. set the partition type to "W95 FAT32 (LBA)"
+    echo ""
+    echo "  - setting correct partition type"
+    printf "t\n1\nc\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
+
+    # 6. set the first partition as bootable
+    echo ""
+    echo "  - setting bootable flag"
+    printf "a\n1\nw\n" | sudo fdisk $DEVICE_LOCATION
+    wait_for_device
 
     echo ""
     echo " * Printing the new partition table..."
@@ -269,7 +284,7 @@ create_partitions()
 
 unmount_all()
 {
-    echo " * Unmounting mouted partitions..."
+    echo " * Unmounting mounted partitions..."
     sync
 
     sudo umount -l ${DEVICE_LOCATION}${DEVICE_SUFFIX}1 > /dev/null 2>&1
@@ -291,12 +306,12 @@ format_data()
 
     echo "  - formatting 'cache'"
     echo ""
-    sudo mkfs.ext4 -L cache ${DEVICE_LOCATION}${DEVICE_SUFFIX}3
+    sudo mkfs.ext4 -F -L cache ${DEVICE_LOCATION}${DEVICE_SUFFIX}3
     ((TEST+=$?))
 
     echo "  - formatting 'userdata'"
     echo ""
-    sudo mkfs.ext4 -L userdata ${DEVICE_LOCATION}${DEVICE_SUFFIX}4
+    sudo mkfs.ext4 -F -L userdata ${DEVICE_LOCATION}${DEVICE_SUFFIX}4
     ((TEST+=$?))
 
     if [[ $TEST -gt 0 ]]; then
@@ -318,7 +333,7 @@ format_system()
     echo ""
     echo "  - formatting 'system'"
     echo ""
-    sudo mkfs.ext4 -L system ${DEVICE_LOCATION}${DEVICE_SUFFIX}2
+    sudo mkfs.ext4 -F -L system ${DEVICE_LOCATION}${DEVICE_SUFFIX}2
     ((TEST+=$?))
 
     if [[ $TEST -gt 0 ]]; then
@@ -329,6 +344,9 @@ format_system()
 
 copy_files()
 {
+    echo " * Copying new system files..."
+    DIR_NAME="/media/rpi-sd-boot"
+
     BOOT_DIR="boot"
     if [ ! -d $BOOT_DIR ]; then
         echo "ERR: boot directory not found!"
@@ -340,9 +358,6 @@ copy_files()
         echo "ERR: system image not found!"
         exit 1
     fi
-
-    echo " * Copying new system files..."
-    DIR_NAME="/media/rpi-sd-boot"
 
     echo "   - mounting the boot partition to $DIR_NAME"
     sudo rm -rf $DIR_NAME > /dev/null 2>&1

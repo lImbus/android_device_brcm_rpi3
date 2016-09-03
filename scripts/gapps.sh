@@ -17,18 +17,17 @@
 #
 
 #
-# OpenGApps installation script for Raspberry Pi 3
+# OpenGApps installation script
 # Author: Igor Kalkov
 # https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-n/scripts/gapps.sh
 #
 
 TIMESTAMP="20160827"
-PACKAGE=""
 
 SHOW_HELP=false
 ADB_ADDRESS=""
-
-ARCHITECTURE="none"
+ARCHITECTURE=""
+PACKAGE_NAME=""
 
 # ------------------------------------------------
 # Helping functions
@@ -38,9 +37,9 @@ show_help()
 {
 cat << EOF
 USAGE:
-  $0 [-h] -i IP -a ARCH
+  $0 [-h] -a ARCH -i IP
 OPTIONS:
-  -a  Architecture of the device [x86] [x86_64] [arm] [arm64]
+  -a  Device architecture: x86, x86_64, arm, arm64
   -h  Show help
   -i  IP address for ADB
 EOF
@@ -99,17 +98,17 @@ prepare_gapps()
     if [ ! -d "gapps/pkg" ]; then
         echo " * Downloading OpenGApps package..."
         echo ""
-        wget https://github.com/opengapps/$ARCHITECTURE/releases/download/$TIMESTAMP/$PACKAGE -O gapps/$PACKAGE
+        wget https://github.com/opengapps/$ARCHITECTURE/releases/download/$TIMESTAMP/$PACKAGE_NAME -O gapps/$PACKAGE_NAME
     fi
 
-    if [ ! -f "gapps/$PACKAGE" ]; then
+    if [ ! -f "gapps/$PACKAGE_NAME" ]; then
         echo "ERR: package download failed!"
     fi
 
     if [ ! -d "gapps/pkg" ]; then
         echo " * Unzipping package..."
         echo ""
-        unzip "gapps/$PACKAGE" -d "gapps/pkg"
+        unzip "gapps/$PACKAGE_NAME" -d "gapps/pkg"
         echo ""
     fi
 
@@ -144,6 +143,9 @@ create_partition()
 
 install_package()
 {
+    echo " * Waiting for ADB..."
+    wait_for_adb
+
     echo " * Removing old package installer..."
     adb shell "rm -rf system/priv-app/PackageInstaller"
 
@@ -151,7 +153,6 @@ install_package()
     adb push gapps/sys /system
 
     echo " * Enforcing a reboot, please be patient..."
-    wait_for_adb
     reboot_device
 
     echo " * Waiting for ADB..."
@@ -182,7 +183,7 @@ esac
 done
 
 if [ "$ARCHITECTURE" != "x86" -a "$ARCHITECTURE" != "x86_64" -a "$ARCHITECTURE" != "arm" -a "$ARCHITECTURE" != "arm64" ]; then
-    echo "wrong arch $ARCHITECTURE";
+    echo "ERR: $ARCHITECTURE is not a valid architecture!";
     show_help
     exit 1
 fi
@@ -192,9 +193,11 @@ if [[ "$SHOW_HELP" = true ]]; then
     exit 1
 fi
 
-PACKAGE="open_gapps-$ARCHITECTURE-7.0-pico-$TIMESTAMP.zip"
-echo "GApps installation script for RPi/x86"
-echo "Used package: $PACKAGE"
+# create the full package name
+PACKAGE_NAME="open_gapps-$ARCHITECTURE-7.0-pico-$TIMESTAMP.zip"
+
+echo "GApps installation script"
+echo "Used package: $PACKAGE_NAME"
 echo "ADB IP address: $ADB_ADDRESS"
 echo ""
 
