@@ -7,16 +7,20 @@ PRODUCT_BRAND := Android
 PRODUCT_MODEL := Raspberry Pi 3
 PRODUCT_MANUFACTURER := brcm
 
-# dalvik heap config
+# Dalvik heap config
 include frameworks/native/build/tablet-7in-hdpi-1024-dalvik-heap.mk
 
+# Required hardware packages
 PRODUCT_PACKAGES += \
     libGLES_mesa \
     gralloc.$(TARGET_PRODUCT) \
     hwcomposer.$(TARGET_PRODUCT) \
     wpa_supplicant \
-    wpa_supplicant.conf \
-    EVWidgets
+    wpa_supplicant.conf
+
+# Additional RTAndroid packages
+PRODUCT_PACKAGES += \
+    PowerOff
 
 # I2C tools
 PRODUCT_PACKAGES += \
