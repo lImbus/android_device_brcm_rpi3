@@ -19,10 +19,11 @@
 #
 # OpenGApps installation script
 # Author: Igor Kalkov
-# https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-n/scripts/gapps.sh
+# https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-7.1/scripts/gapps.sh
 #
 
-TIMESTAMP="20160827"
+TIMESTAMP="20161026"
+VERSION="7.1"
 
 SHOW_HELP=false
 ADB_ADDRESS=""
@@ -123,7 +124,7 @@ create_partition()
     echo " * Extracting supplied packages..."
     rm -rf gapps/tmp > /dev/null 2>&1
     mkdir -p gapps/tmp
-    find . -name "*.tar.xz" -exec tar -xf {} -C gapps/tmp/ \;
+    find . -name "*.tar.[g|l|x]z" -exec tar -xf {} -C gapps/tmp/ \;
 
     echo " * Creating local system partition..."
     rm -rf gapps/sys > /dev/null 2>&1
@@ -194,7 +195,7 @@ if [[ "$SHOW_HELP" = true ]]; then
 fi
 
 # create the full package name
-PACKAGE_NAME="open_gapps-$ARCHITECTURE-7.0-pico-$TIMESTAMP.zip"
+PACKAGE_NAME="open_gapps-$ARCHITECTURE-$VERSION-pico-$TIMESTAMP.zip"
 
 echo "GApps installation script"
 echo "Used package: $PACKAGE_NAME"
