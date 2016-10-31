@@ -22,8 +22,9 @@
 # https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-7.1/scripts/gapps.sh
 #
 
-TIMESTAMP="20161026"
+TIMESTAMP="20161031"
 VERSION="7.1"
+VARIANT="pico"
 
 SHOW_HELP=false
 ADB_ADDRESS=""
@@ -147,11 +148,19 @@ install_package()
     echo " * Waiting for ADB..."
     wait_for_adb
 
-    echo " * Removing old package installer..."
-    adb shell "rm -rf system/priv-app/PackageInstaller"
-
     echo " * Pushing system files..."
-    adb push gapps/sys /system
+    adb push gapps/sys/. /system/.
+
+    echo " * Setting up the package installer..."
+    count=$(adb shell ls -al /system/priv-app/ | grep -o Installer | wc -l)
+    if [ "$count" == 1 ]; then
+        echo "  - only one package installer found, leaving it as it is..."
+    elif [ "$count" == 2 ]; then
+        echo "  - two package installers found, removing the stock one..."
+        adb shell "rm -rf /system/priv-app/PackageInstaller"
+    else
+        echo "  - $count package installers found, something is very wrong!"
+    fi
 
     echo " * Enforcing a reboot, please be patient..."
     reboot_device
@@ -195,10 +204,11 @@ if [[ "$SHOW_HELP" = true ]]; then
 fi
 
 # create the full package name
-PACKAGE_NAME="open_gapps-$ARCHITECTURE-$VERSION-pico-$TIMESTAMP.zip"
+PACKAGE_NAME="open_gapps-$ARCHITECTURE-$VERSION-$VARIANT-$TIMESTAMP.zip"
 
 echo "GApps installation script"
 echo "Used package: $PACKAGE_NAME"
+echo "ADB version: $(adb version)"
 echo "ADB IP address: $ADB_ADDRESS"
 echo ""
 
@@ -210,6 +220,12 @@ install_package
 echo " * Waiting for ADB..."
 wait_for_adb
 
+echo ""
 echo "All done. The device will reboot once again."
+
+echo ""
+echo "NOTE: Please be patient and give it time to initialize the installed packages."
+echo "It can take up to 10 minutes for the system to get responsive after boot."
+
 reboot_device
 adb kill-server
