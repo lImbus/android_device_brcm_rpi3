@@ -22,7 +22,7 @@
 # https://github.com/RTAndroid/android_device_brcm_rpi3/blob/aosp-7.1/scripts/gapps.sh
 #
 
-TIMESTAMP="20161031"
+TIMESTAMP="20161117"
 VERSION="7.1"
 VARIANT="pico"
 
