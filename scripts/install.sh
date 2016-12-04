@@ -55,6 +55,15 @@ OPTIONS:
 EOF
 }
 
+check_dependency()
+{
+    which $1 > /dev/null
+    if (($? != 0));then
+        echo "ERR: $1 not found. Please install: \"$2\""
+        exit 1
+    fi
+}
+
 check_device()
 {
     echo " * Checking access permissions..."
@@ -379,6 +388,9 @@ copy_files()
 # --------------------------------------
 # Script entry point
 # --------------------------------------
+
+check_dependency adb phablet-tools
+check_dependency lzip lzip
 
 # save the passed options
 while getopts ":fhp" flag; do

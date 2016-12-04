@@ -47,6 +47,15 @@ OPTIONS:
 EOF
 }
 
+check_dependency()
+{
+    which $1 > /dev/null
+    if (($? != 0));then
+        echo "ERR: $1 not found. Please install: \"$2\""
+        exit 1
+    fi
+}
+
 reboot_device()
 {
     adb reboot bootloader > /dev/null &
@@ -176,6 +185,9 @@ install_package()
 # ------------------------------------------------
 # Script entry point
 # ------------------------------------------------
+
+check_dependency adb phablet-tools
+check_dependency partprobe parted
 
 # save the passed options
 while getopts ":i:a:h" flag; do
