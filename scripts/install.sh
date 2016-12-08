@@ -390,7 +390,7 @@ copy_files()
 # --------------------------------------
 
 check_dependency adb phablet-tools
-check_dependency lzip lzip
+check_dependency partprobe parted
 
 # save the passed options
 while getopts ":fhp" flag; do

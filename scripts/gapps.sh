@@ -187,7 +187,7 @@ install_package()
 # ------------------------------------------------
 
 check_dependency adb phablet-tools
-check_dependency partprobe parted
+check_dependency lzip lzip
 
 # save the passed options
 while getopts ":i:a:h" flag; do
