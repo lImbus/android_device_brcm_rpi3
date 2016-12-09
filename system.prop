@@ -4,5 +4,5 @@ ro.build.selinux=1
 ro.opengles.version=131072
 ro.radio.noril=1
 ro.rfkilldisabled=1
-ro.sf.lcd_density=190
+ro.sf.lcd_density=160
 wifi.interface=wlan0
