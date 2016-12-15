@@ -389,7 +389,6 @@ copy_files()
 # Script entry point
 # --------------------------------------
 
-check_dependency adb phablet-tools
 check_dependency partprobe parted
 
 # save the passed options
