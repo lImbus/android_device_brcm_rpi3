@@ -29,10 +29,6 @@ PRODUCT_PACKAGES += \
     i2cset \
     i2cdump
 
-# FIX Audio
-PRODUCT_COPY_FILES := \
-    $(LOCAL_PATH)/audio.primary.rpi3.so:system/lib/hw/audio.primary.rpi3.so
-
 PRODUCT_COPY_FILES := \
     frameworks/native/data/etc/android.hardware.ethernet.xml:system/etc/permissions/android.hardware.ethernet.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
