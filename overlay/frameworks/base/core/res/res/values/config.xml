@@ -24,9 +24,6 @@
     <!-- If this is true, the screen will come on when you unplug usb/power/whatever. -->
     <bool name="config_unplugTurnsOnScreen">false</bool>
 
-    <!-- Regex of wired ethernet ifaces -->
-    <!-- <string translatable="false" name="config_ethernet_iface_regex">eth0</string> -->
-
     <!-- Flag indicating that this device does not rotate will always remain in its default orientation. -->
     <bool name="config_forceDefaultOrientation">true</bool>
 
