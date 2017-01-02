@@ -12,10 +12,10 @@ include frameworks/native/build/tablet-7in-hdpi-1024-dalvik-heap.mk
 
 # Required hardware packages
 PRODUCT_PACKAGES += \
-    libGLES_mesa \
     audio.primary.$(TARGET_PRODUCT) \
     gralloc.$(TARGET_PRODUCT) \
     hwcomposer.$(TARGET_PRODUCT) \
+    libGLES_mesa \
     wpa_supplicant \
     wpa_supplicant.conf
 
