@@ -16,6 +16,7 @@ PRODUCT_PACKAGES += \
     audio.primary.$(TARGET_PRODUCT) \
     gralloc.$(TARGET_PRODUCT) \
     hwcomposer.$(TARGET_PRODUCT) \
+    audio.primary.$(TARGET_PRODUCT) \
     wpa_supplicant \
     wpa_supplicant.conf
 
