@@ -144,6 +144,7 @@ check_partitions()
 check_sizes()
 {
     echo " * Validating partition sizes..."
+    sleep 1
 
     PARTITION1_SIZE_SECTORS=$(cat "/sys/block/${DEVICE_NAME}/${DEVICE_NAME}${DEVICE_SUFFIX}1/size")
     if [[ -z "$PARTITION1_SIZE_SECTORS" ]]; then
