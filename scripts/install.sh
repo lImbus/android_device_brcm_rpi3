@@ -357,7 +357,7 @@ copy_files()
     echo " * Copying new system files..."
     DIR_NAME="/media/rpi-sd-boot"
 
-    BOOT_DIR="boot"
+    BOOT_DIR="./boot"
     if [ ! -d $BOOT_DIR ]; then
         echo "ERR: boot directory not found!"
         exit 1
