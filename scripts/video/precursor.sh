@@ -14,8 +14,9 @@ PATCHFILE=$2
 #create download link
 GITHUB_RAW="https://raw.githubusercontent.com/RTAndroid/android_device_brcm_rpi3/$CURRENT_HASH/$PATCH_PATH/$PATCHFILE"
 
-PATCH=$(curl -sf $GITHUB_RAW)
+PATCH=$(curl -f $GITHUB_RAW)
 STATUS=$?
+
 if [ $PATCHFILE="custom" ]
   then 
      if [ $# -le 2 ]
@@ -25,10 +26,11 @@ if [ $PATCHFILE="custom" ]
          exit 1
      fi
      RESOLUTION=$3
-     PATCH=${PATCH/$RES_PLACEHOLDER/$RESOLUTION}
+     echo CUSTOM_PLACEHOLDER=$CUSTOM_PLACEHOLDER
+     PATCH=${PATCH//$CUSTOM_PLACEHOLDER=/$RESOLUTION}
 fi
 
-echo $RESOLUTION
+echo $PATCH
 if [ $STATUS -eq 0 ]
   then
     echo "patching filesystem"
