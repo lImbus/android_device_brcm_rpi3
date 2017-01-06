@@ -144,6 +144,7 @@ check_partitions()
 check_sizes()
 {
     echo " * Validating partition sizes..."
+    sleep 1
 
     PARTITION1_SIZE_SECTORS=$(cat "/sys/block/${DEVICE_NAME}/${DEVICE_NAME}${DEVICE_SUFFIX}1/size")
     if [[ -z "$PARTITION1_SIZE_SECTORS" ]]; then
@@ -356,7 +357,7 @@ copy_files()
     echo " * Copying new system files..."
     DIR_NAME="/media/rpi-sd-boot"
 
-    BOOT_DIR="boot"
+    BOOT_DIR="./boot"
     if [ ! -d $BOOT_DIR ]; then
         echo "ERR: boot directory not found!"
         exit 1
@@ -389,7 +390,6 @@ copy_files()
 # Script entry point
 # --------------------------------------
 
-check_dependency adb phablet-tools
 check_dependency partprobe parted
 
 # save the passed options
