@@ -1,6 +1,5 @@
 
 
-
 if [ $# -le 1 ]
   then
     echo "Please provide the needed patchfile and the sdcard mountpoint"
@@ -26,14 +25,15 @@ if [ $PATCHFILE="custom" ]
          exit 1
      fi
      RESOLUTION=$3
-     echo CUSTOM_PLACEHOLDER=$CUSTOM_PLACEHOLDER
-     PATCH=${PATCH//$CUSTOM_PLACEHOLDER=/$RESOLUTION}
+     PATCH=${PATCH//$CUSTOM_PLACEHOLDER/$RESOLUTION}
 fi
 
 echo $PATCH
 if [ $STATUS -eq 0 ]
   then
     echo "patching filesystem"
+    echo "TODO MOUNT!!!"
+    exit 0
     echo $PATCH | patch MOUNTPOINT
   else
     echo "Download failed. Valid patchfile chosen?"
