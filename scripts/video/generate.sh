@@ -1,9 +1,25 @@
 #!/bin/bash
 
 
+FILENAME="set_video.sh"
+PRECURSOR="precursor.sh"
+
+PATCH_FOLDER="patches"
+
+#get current commit
 CURRENT_HASH=$(git log --pretty=format:'%H' -n 1)
-GITHUB_RAW="https://raw.githubusercontent.com/RTAndroid/android_device_brcm_rpi3/$CURRENT_HASH/FILE_PLACEHOLDER"
+#get relative path of patch folder
+PATCH_PATH=$(git ls-tree --full-name --name-only HEAD ./$PATCH_FOLDER)
 
-git ls-tree --full-name --name-only HEAD $FILENAME
+#get patch folder contents
+PATCHES=$(ls $PATCH_FOLDER | sed -e 's/\s\+/,/g')
 
-echo $GITHUB_RAW
+
+echo "#!/bin/bash" > $FILENAME
+echo CURRENT_HASH=$CURRENT_HASH >> $FILENAME
+echo PATCH_PATH=$PATCH_PATH >> $FILENAME
+echo PATCHES=\"$PATCHES\">> $FILENAME
+cat $PRECURSOR >> $FILENAME
+
+chmod +x $FILENAME
+
